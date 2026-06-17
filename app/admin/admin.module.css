@@ -1,0 +1,74 @@
+/* app/admin/admin.module.css
+   Plain, functional styling for the internal admin tool. Uses the shared
+   parchment palette so it isn't jarring, but stays utilitarian on purpose. */
+
+.shell {
+  min-height: 100vh;
+}
+
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  background: var(--ink);
+  color: var(--parchment);
+}
+
+.brand {
+  font-family: var(--font-display), serif;
+  letter-spacing: 0.03em;
+}
+
+.who {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* `:global` lets us style the plain "signout" class used in SignOutButton.js,
+   which isn't part of this CSS module's auto-scoped names. */
+.who :global(.signout) {
+  font-family: inherit;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.7rem;
+  color: var(--ink);
+  background: var(--parchment);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.body {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem;
+}
+
+.h1 {
+  margin-bottom: 0.75rem;
+}
+
+.list {
+  margin: 0.75rem 0 0 1.25rem;
+}
+
+.todo {
+  margin-top: 1.5rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.denied {
+  max-width: 36rem;
+}
+
+.denied code {
+  background: var(--parchment-deep);
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+}
