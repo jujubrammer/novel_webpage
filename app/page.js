@@ -9,6 +9,7 @@
 // placeholder so your first deploy to Vercel looks intentional, not empty.
 // ---------------------------------------------------------------------------
 
+import Link from "next/link";
 import styles from "./page.module.css";
 
 // A React component is just a function that returns the markup (JSX) to show.
@@ -38,6 +39,13 @@ export default function Home() {
           encyclopedias of <strong>characters</strong>,{" "}
           <strong>monsters</strong>, and <strong>locations</strong>, along with
           a map of the known world.
+        </p>
+
+        {/* Temporary convenience link to the private editor while we build.
+            In Phase 4 the public nav replaces this; the Keeper's Desk stays
+            reachable but won't be advertised on the public home page. */}
+        <p className={styles.keeper}>
+          <Link href="/admin">Keeper&rsquo;s sign-in &rarr;</Link>
         </p>
       </div>
     </main>

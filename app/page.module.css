@@ -82,3 +82,11 @@
 .note strong {
   color: var(--ink);
 }
+
+/* Small, understated link to the Keeper's Desk (temporary, dev convenience). */
+.keeper {
+  margin-top: 2rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}

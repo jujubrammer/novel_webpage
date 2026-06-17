@@ -1,12 +1,15 @@
 // app/admin/layout.js
 // ---------------------------------------------------------------------------
 // This layout wraps EVERY page under /admin. It is a SERVER component, so it
-// can safely read the session and secret env vars (this code never runs in the
-// browser). It is the real authorization gate:
+// can safely read the session (this code never runs in the browser). It is the
+// authorization gate for PAGE RENDERING:
 //
-//   1. proxy.js already bounced anyone who isn't logged in.
-//   2. Here we additionally require the logged-in user's email to be on the
-//      ADMIN_EMAILS allow-list. Logged in but not an admin → "Not authorized".
+//   * Not signed in        -> redirect to /sign-in
+//   * Signed in, not admin -> show "Not authorized"
+//   * Signed in admin      -> show the page
+//
+// (Database MUTATIONS are gated separately inside the server actions via
+// requireAdmin(), because layouts do not wrap server actions.)
 //
 // `dynamic = "force-dynamic"` tells Next.js to render this fresh on every
 // request (never cache it), which is required because it reads the session.
@@ -14,30 +17,11 @@
 
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth/server";
+import { isAdminEmail } from "@/lib/auth/admin";
 import SignOutButton from "./SignOutButton";
 import styles from "./admin.module.css";
 
 export const dynamic = "force-dynamic";
-
-// Read the allow-list from the environment. We split the comma-separated list
-// into individual emails. We do NOT silently fall back if it's missing — a
-// missing ADMIN_EMAILS is a configuration error and should throw.
-function getAdminEmails() {
-  const raw = process.env.ADMIN_EMAILS;
-  if (!raw) {
-    throw new Error(
-      "Missing required environment variable ADMIN_EMAILS. " +
-        "Set it in .env.local to a comma-separated list of admin emails " +
-        "(e.g. ADMIN_EMAILS=juliana@example.com)."
-    );
-  }
-  // Splitting a comma list and normalizing case is list-parsing, not masking a
-  // wrong value: an email that doesn't match simply gets denied access.
-  return raw
-    .split(",")
-    .map((entry) => entry.trim().toLowerCase())
-    .filter(Boolean);
-}
 
 export default async function AdminLayout({ children }) {
   // getSession() returns { data, error }. When signed in, data.user.email holds
@@ -45,13 +29,12 @@ export default async function AdminLayout({ children }) {
   const { data } = await auth.getSession();
   const user = data?.user;
 
-  // Defense in depth: if somehow there's no session here, send to sign-in.
+  // Not signed in → send to sign-in (this replaces what proxy.js used to do).
   if (!user) {
     redirect("/sign-in");
   }
 
-  const adminEmails = getAdminEmails();
-  const isAdmin = adminEmails.includes(user.email.toLowerCase());
+  const isAdmin = isAdminEmail(user.email);
 
   return (
     <div className={styles.shell}>
