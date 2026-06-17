@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@neondatabase/auth": "^0.4.2-beta",
+    "@neondatabase/serverless": "^1.1.0",
+    "@vercel/blob": "^2.4.0",
+    "ai": "^6.0.207",
     "next": "16.2.9",
     "react": "19.2.4",
     "react-dom": "19.2.4"
