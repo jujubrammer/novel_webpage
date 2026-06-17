@@ -37,11 +37,18 @@ export async function POST(request) {
   }
 
   try {
-    // Generate the image via the AI Gateway → OpenAI gpt-image-2.
+    // Which image model to use, via the AI Gateway. OpenAI's gpt-image models
+    // are gated on the free tier, so we default to FLUX (great for fantasy
+    // art). You can switch models WITHOUT a code change by setting the
+    // PORTRAIT_IMAGE_MODEL env var in Vercel to any gateway image model id
+    // (e.g. "google/imagen-4.0-generate-001", "xai/grok-imagine-image").
+    const modelId = process.env.PORTRAIT_IMAGE_MODEL || "bfl/flux-pro-1.1";
+
+    // No size/aspectRatio passed: defaults work across providers and avoid
+    // "unsupported size" errors when swapping models.
     const { image } = await generateImage({
-      model: gateway.imageModel("openai/gpt-image-2"),
+      model: gateway.imageModel(modelId),
       prompt,
-      size: "1024x1024",
     });
 
     // Persist the bytes to Blob so we have a stable public URL.
