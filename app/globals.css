@@ -1,0 +1,100 @@
+/* app/globals.css
+   ---------------------------------------------------------------------------
+   GLOBAL STYLES — these rules apply to the whole site.
+   We define the "ancient archive" look here once so every page is consistent.
+
+   Beginner concept: CSS CUSTOM PROPERTIES (a.k.a. "CSS variables").
+   Anything written as `--name: value;` inside `:root` becomes a reusable value
+   you can read later with `var(--name)`. Change a color here once and it
+   updates everywhere. This is how we keep the parchment theme consistent.
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* --- Light parchment palette (the default look for the whole site) --- */
+  --parchment: #f4ecd8;        /* main page background — warm aged paper      */
+  --parchment-deep: #e9dcbf;   /* slightly darker paper for panels/cards      */
+  --ink: #3a2c1a;              /* dark brown "ink" for body text              */
+  --ink-soft: #6b5942;         /* muted brown for secondary text              */
+  --gold: #9c7a32;             /* gilded accent for borders & links           */
+  --gold-bright: #c2a14d;      /* brighter gold for hover/highlights          */
+  --border: #cbb583;           /* soft tan used for hairline borders          */
+
+  /* Fonts come from app/layout.js. We give safe fallbacks after each var so
+     text still looks reasonable if the web font hasn't loaded yet. */
+  --font-display: Georgia, "Times New Roman", serif;
+  --font-body: Georgia, "Times New Roman", serif;
+}
+
+/* The universal selector `*` targets EVERY element. Resetting box-sizing,
+   margin, and padding gives us a predictable starting point on all browsers. */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  color: var(--ink);
+  /* The web font variable comes first; if it fails to load, the serif
+     fallback after the comma is used. */
+  font-family: var(--font-body), Georgia, "Times New Roman", serif;
+  line-height: 1.65;
+
+  /* The parchment background: a flat warm color, plus two faint radial
+     "stains" using layered gradients to suggest aged, uneven paper.
+     Beginner note: you can stack multiple backgrounds separated by commas;
+     the first one listed sits on top. */
+  background-color: var(--parchment);
+  background-image:
+    radial-gradient(
+      circle at 20% 15%,
+      rgba(156, 122, 50, 0.06),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 85% 80%,
+      rgba(156, 122, 50, 0.05),
+      transparent 40%
+    );
+  background-attachment: fixed; /* the stains stay put as you scroll */
+
+  /* Smoother font rendering on Mac/WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings use the engraved display font and the deep-ink color. */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display), Georgia, serif;
+  color: var(--ink);
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+/* Links look like gilded text and gently brighten when hovered. */
+a {
+  color: var(--gold);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--gold-bright);
+}
+
+/* A small reusable helper: center content and cap its width so long lines of
+   text stay readable on very wide screens. We'll reuse `.container` later. */
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;      /* `0 auto` centers a fixed-width block horizontally */
+  padding: 0 1.25rem;  /* breathing room on the left/right, esp. on mobile  */
+}

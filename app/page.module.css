@@ -1,0 +1,84 @@
+/* app/page.module.css
+   ---------------------------------------------------------------------------
+   This is a CSS MODULE. Because the filename ends in `.module.css`, Next.js
+   automatically "scopes" these class names to the page that imports it
+   (app/page.js). That means a class like `.hero` here will NOT clash with a
+   `.hero` defined on another page — Next quietly renames them behind the
+   scenes. Use modules for page-specific styles; use globals.css for shared
+   theme rules.
+   --------------------------------------------------------------------------- */
+
+.hero {
+  /* Fill the viewport height and center the welcome text vertically. */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 0;
+}
+
+/* Small uppercase line above the title, in muted ink with wide letterspacing
+   to feel like an engraved label. */
+.kicker {
+  font-family: var(--font-display), serif;
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin-bottom: 0.75rem;
+}
+
+.title {
+  /* `clamp(min, preferred, max)` makes the title fluidly responsive: it scales
+     with the screen width but never smaller than 2.5rem or larger than 5rem.
+     This is a beginner-friendly way to size text without media queries. */
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+
+.subtitle {
+  max-width: 32rem;
+  margin: 1.25rem auto 0; /* center the block and add space above */
+  font-size: 1.15rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+/* The decorative gilded divider line with a centered diamond. */
+.divider {
+  position: relative;
+  width: 60%;
+  max-width: 320px;
+  height: 1px;
+  margin: 2.5rem auto;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--gold),
+    transparent
+  );
+}
+
+.diamond {
+  /* Pull the diamond up so it sits centered ON the line. */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--parchment); /* mask the line directly behind the symbol */
+  padding: 0 0.6rem;
+  color: var(--gold);
+  font-size: 0.9rem;
+}
+
+.note {
+  max-width: 38rem;
+  margin: 0 auto;
+  color: var(--ink-soft);
+}
+
+.note strong {
+  color: var(--ink);
+}
