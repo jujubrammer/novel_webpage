@@ -21,6 +21,12 @@ export const dynamic = "force-dynamic";
 // Image generation can take a while; allow up to 60s on Vercel.
 export const maxDuration = 60;
 
+// The image model to use, via the AI Gateway. OpenAI's gpt-image models are
+// gated on the free tier, so we use FLUX (great for fantasy art). To change the
+// art style later, edit this one line to another gateway image model id, e.g.
+// "google/imagen-4.0-generate-001" or "xai/grok-imagine-image".
+const PORTRAIT_MODEL = "bfl/flux-pro-1.1";
+
 export async function POST(request) {
   // Only signed-in admins may generate images.
   const { data } = await auth.getSession();
@@ -37,17 +43,10 @@ export async function POST(request) {
   }
 
   try {
-    // Which image model to use, via the AI Gateway. OpenAI's gpt-image models
-    // are gated on the free tier, so we default to FLUX (great for fantasy
-    // art). You can switch models WITHOUT a code change by setting the
-    // PORTRAIT_IMAGE_MODEL env var in Vercel to any gateway image model id
-    // (e.g. "google/imagen-4.0-generate-001", "xai/grok-imagine-image").
-    const modelId = process.env.PORTRAIT_IMAGE_MODEL || "bfl/flux-pro-1.1";
-
-    // No size/aspectRatio passed: defaults work across providers and avoid
-    // "unsupported size" errors when swapping models.
+    // No size/aspectRatio passed: the model's default works fine and avoids
+    // "unsupported size" errors.
     const { image } = await generateImage({
-      model: gateway.imageModel(modelId),
+      model: gateway.imageModel(PORTRAIT_MODEL),
       prompt,
     });
 
