@@ -20,11 +20,6 @@ export default function CharacterForm({ action, character }) {
         <input name="name" defaultValue={c.name || ""} required />
       </label>
 
-      <div className={styles.label}>
-        Portrait
-        <PhotoUploader name="image_url" initialUrl={c.image_url || ""} />
-      </div>
-
       <div className={styles.row}>
         <label className={styles.label}>
           Age
@@ -65,6 +60,13 @@ export default function CharacterForm({ action, character }) {
         Important notes
         <textarea name="notes" rows={3} defaultValue={c.notes || ""} />
       </label>
+
+      {/* Portrait sits at the bottom so the description fields above are filled
+          in before you generate from them. */}
+      <div className={styles.label}>
+        Portrait
+        <PhotoUploader name="image_url" initialUrl={c.image_url || ""} />
+      </div>
 
       <div className={styles.actions}>
         <button type="submit" className={styles.save}>

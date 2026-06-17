@@ -1,10 +1,13 @@
 // app/admin/characters/PhotoUploader.js
-// A CLIENT component for setting a character photo two ways:
+// A CLIENT component for setting a character photo. Two ways:
 //   1. Upload a file from your device (direct to Vercel Blob).
-//   2. Generate one with AI from the character's description.
-// Either way, the resulting public URL is stored in a hidden form field named
-// `image_url`, which the server action saves. The server never handles the raw
-// file/bytes for uploads (the browser talks to Blob directly).
+//   2. Generate one with AI from the character's description (the other form
+//      fields). If an image is already set (uploaded or previously generated),
+//      it's sent along as a REFERENCE so the new portrait keeps the same
+//      character — so you can upload a base image, then refine with the text.
+// The resulting public URL is stored in a hidden field named `image_url`, which
+// the server action saves. This sits at the bottom of the form so the
+// description fields are filled in before you generate from them.
 
 "use client";
 
@@ -12,29 +15,23 @@ import { useState } from "react";
 import { upload } from "@vercel/blob/client";
 import styles from "../admin.module.css";
 
-// Build an image prompt from whatever the keeper has typed in the form so far.
-function buildPrompt(form) {
-  const get = (n) => (form?.elements?.namedItem(n)?.value || "").trim();
-  const name = get("name");
-  const species = get("species");
-  const appearance = get("appearance");
-  const personality = get("personality");
-
-  const parts = [];
-  parts.push("Fantasy character portrait" + (name ? ` of ${name}` : ""));
-  if (species) parts.push(`a ${species}`);
-  if (appearance) parts.push(appearance);
-  if (personality) parts.push(`personality: ${personality}`);
-  parts.push(
-    "head-and-shoulders, detailed painted illustration, fantasy encyclopedia art style, muted parchment tones"
-  );
-  return parts.join(". ");
+// Collect the description fields the image prompt is built from (on the server).
+function collectCharacter(form) {
+  const f = (n) => (form?.elements?.namedItem(n)?.value || "").trim();
+  return {
+    name: f("name"),
+    age: f("age"),
+    species: f("species"),
+    appearance: f("appearance"),
+    personality: f("personality"),
+    abilities: f("abilities"),
+  };
 }
 
 export default function PhotoUploader({ name = "image_url", initialUrl = "" }) {
   const [url, setUrl] = useState(initialUrl || "");
   const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState(""); // small "Uploading…/Generating…" note
+  const [status, setStatus] = useState("");
   const [error, setError] = useState("");
 
   async function handleFile(event) {
@@ -58,17 +55,26 @@ export default function PhotoUploader({ name = "image_url", initialUrl = "" }) {
   }
 
   async function handleGenerate(event) {
-    // A button inside a <form> exposes the form via `.form`.
-    const form = event.currentTarget.form;
-    const prompt = buildPrompt(form);
+    const form = event.currentTarget.form; // the enclosing <form>
+    const character = collectCharacter(form);
+    if (!character.name && !character.appearance && !character.species) {
+      setError("Fill in at least a name, species, or appearance first.");
+      return;
+    }
     setError("");
-    setStatus("Generating… (this can take ~20s)");
+    setStatus(
+      url
+        ? "Generating from the description + your image… (~30s)"
+        : "Generating from the description… (~30s)"
+    );
     setBusy(true);
     try {
       const res = await fetch("/api/generate-portrait", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+        // Send the raw fields; the server writes the prompt (pass 1) then draws
+        // it (pass 2), using the current image as a reference if present.
+        body: JSON.stringify({ character, referenceUrl: url || null }),
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Generation failed.");
@@ -91,7 +97,10 @@ export default function PhotoUploader({ name = "image_url", initialUrl = "" }) {
       )}
 
       <div className={styles.uploaderControls}>
-        <input type="file" accept="image/*" onChange={handleFile} disabled={busy} />
+        <label className={styles.uploadHint}>
+          Upload an image (also used as a starting point if you generate):
+          <input type="file" accept="image/*" onChange={handleFile} disabled={busy} />
+        </label>
 
         <button
           type="button"
@@ -99,9 +108,14 @@ export default function PhotoUploader({ name = "image_url", initialUrl = "" }) {
           onClick={handleGenerate}
           disabled={busy}
         >
-          ✨ Generate with AI
+          ✨ Generate from description
         </button>
 
+        {url && !busy && (
+          <span className={styles.uploadHint}>
+            Generating now will start from this image to keep the character consistent.
+          </span>
+        )}
         {status && <span className={styles.uploadHint}>{status}</span>}
         {error && <p className={styles.error}>{error}</p>}
         {url && !busy && (
