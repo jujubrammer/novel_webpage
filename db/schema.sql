@@ -1,8 +1,8 @@
 -- db/schema.sql
 -- ---------------------------------------------------------------------------
 -- Canonical database schema for the "If You Had Known" archive.
--- This is the source of truth for the tables. The /api/migrate route runs
--- these same statements. They use "IF NOT EXISTS", so re-running is safe.
+-- This is the source of truth for the tables. Run POST /api/migrate
+-- (admin-only) to apply this schema to your Neon database.
 --
 -- Notes for a beginner:
 --   * Each entry gets a UUID `id` (a random unique identifier) and a `slug`
