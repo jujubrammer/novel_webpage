@@ -1,7 +1,5 @@
 // app/admin/page.js
-// The landing page of the private editor (route: /admin). For now it's a
-// placeholder confirming access works. In Phase 3 this becomes the dashboard
-// linking to the Character / Monster / Location editors backed by the database.
+// The landing page of the private editor (route: /admin).
 
 import Link from "next/link";
 import styles from "./admin.module.css";
@@ -17,14 +15,14 @@ export default function AdminHome() {
           <h2>Characters</h2>
           <p>People of the world — add, edit, remove.</p>
         </Link>
-        <span className={`${styles.adminCard} ${styles.soon}`}>
+        <Link href="/admin/monsters" className={styles.adminCard}>
           <h2>Monsters &amp; creatures</h2>
-          <p>Coming next.</p>
-        </span>
-        <span className={`${styles.adminCard} ${styles.soon}`}>
+          <p>Beasts, demons, and things that lurk — add, edit, remove.</p>
+        </Link>
+        <Link href="/admin/locations" className={styles.adminCard}>
           <h2>Locations</h2>
-          <p>Coming next.</p>
-        </span>
+          <p>Cities, ruins, wilds — add, edit, remove.</p>
+        </Link>
       </div>
     </section>
   );
