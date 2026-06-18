@@ -1,7 +1,6 @@
 /* app/sign-in/sign-in.module.css
-   Plain, functional styling for the internal sign-in tool. We still use the
-   parchment palette variables from globals.css so it doesn't clash, but this
-   screen is utilitarian on purpose. */
+   Dark fantasy sign-in screen — Keeper's access portal.
+   Atmospheric but functional: a single centered card on a dark background. */
 
 .wrap {
   min-height: 100vh;
@@ -9,113 +8,166 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
+
+  /* Concentrated vignette deepens the background behind the card,
+     separating it from the global gradient on the body */
+  background:
+    radial-gradient(
+      ellipse 55% 60% at 50% 50%,
+      rgba(200, 152, 58, 0.04),
+      transparent 70%
+    );
 }
 
+/* The sign-in card — floats like a locked journal on a dark desk */
 .card {
   width: 100%;
-  max-width: 24rem;
+  max-width: 22rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 2rem;
-  background: var(--parchment-deep);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  padding: 2.25rem 2rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border-solid);
+  border-radius: 8px;
+  /* Inset gold top-edge shimmer — the Keeper's gilded seal */
+  box-shadow:
+    inset 0 1px 0 rgba(200, 152, 58, 0.15),
+    0 8px 40px rgba(0, 0, 0, 0.5);
 }
 
 .title {
-  font-size: 1.5rem;
+  font-size: 1.45rem;
+  letter-spacing: 0.04em;
+  color: var(--text);
 }
 
 .subtitle {
-  color: var(--ink-soft);
+  color: var(--text-soft);
   margin-top: -0.5rem;
+  font-size: 0.9rem;
+  font-style: italic;
 }
 
+/* Form field labels */
 .field {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  font-size: 0.9rem;
-  color: var(--ink-soft);
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+  letter-spacing: 0.03em;
 }
 
 .field input {
-  font-size: 1rem;
-  padding: 0.55rem 0.7rem;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: var(--parchment);
-  color: var(--ink);
+  font-size: 0.95rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border-solid);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--text);
   font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.field input::placeholder {
+  color: var(--text-faint);
+}
+
+.field input:focus {
+  outline: none;
+  border-color: var(--accent-dim);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* Primary submit button */
 .button {
-  margin-top: 0.5rem;
+  margin-top: 0.25rem;
   padding: 0.65rem 1rem;
-  font-size: 1rem;
-  font-family: inherit;
-  color: var(--parchment);
-  background: var(--ink);
+  font-size: 0.9rem;
+  font-family: var(--font-display), serif;
+  letter-spacing: 0.04em;
+  color: #0d0b0e;
+  background: var(--accent);
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.button:hover {
+  background: var(--gold-bright);
+  box-shadow: 0 0 0 3px rgba(200, 152, 58, 0.2);
 }
 
 .button:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: default;
 }
 
+/* Small mode-toggle text link */
 .toggle {
   background: none;
   border: none;
-  color: var(--gold);
+  color: var(--text-soft);
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-family: inherit;
+  transition: color 0.2s ease;
 }
 
+.toggle:hover {
+  color: var(--accent);
+}
+
+/* Error message — dark-mode aware crimson */
 .error {
-  color: #8a2b2b;
-  background: #f6e4e0;
-  border: 1px solid #d8b8b0;
-  padding: 0.6rem 0.7rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  color: #d07070;
+  background: rgba(120, 40, 40, 0.2);
+  border: 1px solid rgba(180, 80, 80, 0.3);
+  padding: 0.6rem 0.75rem;
+  border-radius: 5px;
+  font-size: 0.875rem;
 }
 
-/* Primary Google button. */
+/* Google OAuth button */
 .google {
   padding: 0.65rem 1rem;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-family: inherit;
-  color: var(--ink);
-  background: var(--parchment);
-  border: 1px solid var(--border);
-  border-radius: 4px;
+  color: var(--text);
+  background: var(--surface-3);
+  border: 1px solid var(--border-solid);
+  border-radius: 5px;
   cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.google:hover {
+  background: var(--surface);
+  border-color: var(--accent-dim);
 }
 
 .google:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: default;
 }
 
-/* A horizontal line with centered "or use email" text. */
+/* "or use email" divider with flanking rules */
 .or {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: var(--ink-soft);
-  font-size: 0.8rem;
+  color: var(--text-faint);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-/* The ::before and ::after draw the lines on either side of the label. */
 .or::before,
 .or::after {
   content: "";
   flex: 1;
   height: 1px;
-  background: var(--border);
+  background: var(--border-solid);
 }
