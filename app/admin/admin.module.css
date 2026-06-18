@@ -249,8 +249,8 @@
    never jumps when a generated/uploaded image appears. */
 .thumb,
 .thumbEmpty {
-  width: 220px;
-  height: 220px;
+  width: 170px;
+  height: 170px;
   border-radius: 8px;
   flex-shrink: 0;
   background: var(--parchment);
@@ -287,6 +287,7 @@
   border-radius: 4px;
   background: var(--parchment);
   color: var(--ink);
+  width: 100%;
   max-width: 360px;
 }
 
@@ -370,6 +371,10 @@
 }
 
 .uploadHint {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
   color: var(--ink-soft);
 }
 
@@ -386,13 +391,15 @@
 
 .generate {
   align-self: flex-start;
-  padding: 0.45rem 0.8rem;
-  background: var(--parchment-deep);
+  padding: 0.55rem 1rem;
+  /* Lighter than the panel (which is --parchment-deep) so the button reads as a
+     button instead of a thin border floating on the same color. */
+  background: var(--parchment);
   color: var(--ink);
   border: 1px solid var(--gold);
   border-radius: 4px;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   cursor: pointer;
 }
 
