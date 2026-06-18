@@ -13,6 +13,7 @@
 
 import { useState } from "react";
 import { upload } from "@vercel/blob/client";
+import { IMAGE_MODELS, DEFAULT_IMAGE_MODEL } from "@/lib/image-models";
 import styles from "../admin.module.css";
 
 // Collect the description fields the image prompt is built from (on the server).
@@ -30,6 +31,7 @@ function collectCharacter(form) {
 
 export default function PhotoUploader({ name = "image_url", initialUrl = "" }) {
   const [url, setUrl] = useState(initialUrl || "");
+  const [model, setModel] = useState(DEFAULT_IMAGE_MODEL);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
@@ -74,7 +76,7 @@ export default function PhotoUploader({ name = "image_url", initialUrl = "" }) {
         headers: { "Content-Type": "application/json" },
         // Send the raw fields; the server writes the prompt (pass 1) then draws
         // it (pass 2), using the current image as a reference if present.
-        body: JSON.stringify({ character, referenceUrl: url || null }),
+        body: JSON.stringify({ character, referenceUrl: url || null, model }),
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Generation failed.");
@@ -100,6 +102,22 @@ export default function PhotoUploader({ name = "image_url", initialUrl = "" }) {
         <label className={styles.uploadHint}>
           Upload an image (also used as a starting point if you generate):
           <input type="file" accept="image/*" onChange={handleFile} disabled={busy} />
+        </label>
+
+        <label className={styles.modelLabel}>
+          Image model:
+          <select
+            className={styles.modelSelect}
+            value={model}
+            onChange={(e) => setModel(e.target.value)}
+            disabled={busy}
+          >
+            {IMAGE_MODELS.map((m) => (
+              <option key={m.id} value={m.id}>
+                {m.label}
+              </option>
+            ))}
+          </select>
         </label>
 
         <button

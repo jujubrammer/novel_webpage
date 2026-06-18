@@ -17,13 +17,14 @@ import { generateText, generateImage, gateway } from "ai";
 import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth/server";
 import { isAdminEmail } from "@/lib/auth/admin";
+import { IMAGE_MODEL_IDS, DEFAULT_IMAGE_MODEL } from "@/lib/image-models";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120; // two model calls; image gen can be slow
 
-// Models (via the AI Gateway). Edit these to change style/quality.
-const PROMPT_MODEL = "openai/gpt-5-mini"; // pass 1: writes the image prompt
-const IMAGE_MODEL = "openai/gpt-image-2"; // pass 2: renders the image
+// Pass 1 (writing the image prompt) always uses this text model. The image
+// model for pass 2 is chosen in the form's dropdown (validated below).
+const PROMPT_MODEL = "openai/gpt-5-mini";
 
 export async function POST(request) {
   // Only signed-in admins may generate images.
@@ -32,7 +33,10 @@ export async function POST(request) {
     return Response.json({ error: "Not authorized." }, { status: 401 });
   }
 
-  const { character, referenceUrl } = await request.json();
+  const { character, referenceUrl, model } = await request.json();
+
+  // Use the chosen model only if it's one we offer; otherwise the default.
+  const imageModel = IMAGE_MODEL_IDS.includes(model) ? model : DEFAULT_IMAGE_MODEL;
 
   // Turn the filled-in fields into a readable block for the text model.
   const details = Object.entries(character || {})
@@ -73,7 +77,7 @@ export async function POST(request) {
     }
 
     const { image } = await generateImage({
-      model: gateway.imageModel(IMAGE_MODEL),
+      model: gateway.imageModel(imageModel),
       prompt: promptArg,
     });
 
