@@ -37,16 +37,18 @@ async function parseResponse(res) {
   return body;
 }
 
-function collectCharacter(form) {
-  const f = (n) => (form?.elements?.namedItem(n)?.value || "").trim();
-  return {
-    name: f("name"),
-    age: f("age"),
-    species: f("species"),
-    appearance: f("appearance"),
-    personality: f("personality"),
-    abilities: f("abilities"),
-  };
+// Collect all named text fields from the form generically so this component
+// works correctly when embedded in monster/location forms (not just characters).
+function collectFormFields(form) {
+  if (!form?.elements) return {};
+  const result = {};
+  for (const el of form.elements) {
+    if (!el.name || el.type === "hidden" || el.type === "file" ||
+        el.type === "submit" || el.type === "button" || el.tagName === "SELECT") continue;
+    const val = (el.value || "").trim();
+    if (val) result[el.name] = val;
+  }
+  return result;
 }
 
 export default function PhotoUploader({ name = "image_url", initialUrl = "" }) {
@@ -83,9 +85,9 @@ export default function PhotoUploader({ name = "image_url", initialUrl = "" }) {
 
   async function handleGenerate(event) {
     const form = event.currentTarget.form;
-    const character = collectCharacter(form);
-    if (!character.name && !character.appearance && !character.species) {
-      setError("Fill in at least a name, species, or appearance first.");
+    const character = collectFormFields(form);
+    if (Object.keys(character).length === 0) {
+      setError("Fill in at least a name or description first.");
       return;
     }
     setError("");
@@ -121,7 +123,7 @@ export default function PhotoUploader({ name = "image_url", initialUrl = "" }) {
   return (
     <div className={styles.uploader}>
       {url ? (
-        <ImageLightbox src={url} alt="Character portrait preview" className={styles.thumb} />
+        <ImageLightbox src={url} alt="Portrait preview" className={styles.thumb} />
       ) : (
         <div className={styles.thumbEmpty}>No image yet</div>
       )}
