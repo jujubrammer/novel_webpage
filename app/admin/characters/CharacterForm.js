@@ -63,8 +63,8 @@ export default function CharacterForm({ action, character }) {
 
       {/* Portrait sits at the bottom so the description fields above are filled
           in before you generate from them. */}
-      <div className={styles.label}>
-        Portrait
+      <div className={styles.portrait}>
+        <span className={styles.portraitTitle}>Portrait</span>
         <PhotoUploader name="image_url" initialUrl={c.image_url || ""} />
       </div>
 

@@ -16,6 +16,7 @@ import {
   DEFAULT_IMAGE_MODEL,
   modelSupportsReference,
 } from "@/lib/image-models";
+import ImageLightbox from "./ImageLightbox";
 import styles from "../admin.module.css";
 
 function collectCharacter(form) {
@@ -102,10 +103,9 @@ export default function PhotoUploader({ name = "image_url", initialUrl = "" }) {
   return (
     <div className={styles.uploader}>
       {url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={url} alt="Character portrait preview" className={styles.thumb} />
+        <ImageLightbox src={url} alt="Character portrait preview" className={styles.thumb} />
       ) : (
-        <div className={styles.thumbEmpty}>No image</div>
+        <div className={styles.thumbEmpty}>No image yet</div>
       )}
 
       <div className={styles.uploaderControls}>
