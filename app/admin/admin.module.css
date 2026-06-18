@@ -1,6 +1,10 @@
 /* app/admin/admin.module.css
-   Plain, functional styling for the internal admin tool. Uses the shared
-   parchment palette so it isn't jarring, but stays utilitarian on purpose. */
+   Dark fantasy styling for the private admin tool.
+   Shares the global token palette; stays purposeful without being decorative. */
+
+/* ============================================================
+   SHELL + NAV BAR
+   ============================================================ */
 
 .shell {
   min-height: 100vh;
@@ -13,35 +17,50 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.85rem 1.25rem;
-  background: var(--ink);
-  color: var(--parchment);
+  background: var(--surface);
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  /* A faint gold top-edge line for the nav — like gilded trim on a book spine */
+  box-shadow: inset 0 1px 0 rgba(200, 152, 58, 0.2);
 }
 
 .brand {
   font-family: var(--font-display), serif;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.05em;
+  font-size: 0.95rem;
+  color: var(--accent);
+  text-transform: uppercase;
 }
 
 .who {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 0.9rem;
-  opacity: 0.9;
+  font-size: 0.85rem;
+  color: var(--text-soft);
 }
 
-/* `:global` lets us style the plain "signout" class used in SignOutButton.js,
-   which isn't part of this CSS module's auto-scoped names. */
+/* `:global` lets us style the plain "signout" class used in SignOutButton.js */
 .who :global(.signout) {
   font-family: inherit;
-  font-size: 0.85rem;
-  padding: 0.3rem 0.7rem;
-  color: var(--ink);
-  background: var(--parchment);
-  border: none;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.75rem;
+  color: var(--text-soft);
+  background: transparent;
+  border: 1px solid var(--border-solid);
   border-radius: 4px;
   cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
 }
+
+.who :global(.signout):hover {
+  color: var(--accent);
+  border-color: var(--accent-dim);
+}
+
+/* ============================================================
+   CONTENT BODY
+   ============================================================ */
 
 .body {
   max-width: 900px;
@@ -51,6 +70,7 @@
 
 .h1 {
   margin-bottom: 0.75rem;
+  letter-spacing: 0.03em;
 }
 
 .list {
@@ -59,7 +79,7 @@
 
 .todo {
   margin-top: 1.5rem;
-  color: var(--ink-soft);
+  color: var(--text-soft);
   font-style: italic;
 }
 
@@ -68,12 +88,18 @@
 }
 
 .denied code {
-  background: var(--parchment-deep);
+  background: var(--surface-2);
   padding: 0.1rem 0.35rem;
   border-radius: 3px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85em;
+  color: var(--accent);
 }
 
-/* --- Dashboard cards --- */
+/* ============================================================
+   DASHBOARD CARDS
+   ============================================================ */
+
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -83,38 +109,53 @@
 
 .adminCard {
   display: block;
-  padding: 1.1rem 1.25rem;
-  background: var(--parchment-deep);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--ink);
+  padding: 1.25rem 1.35rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border-solid);
+  border-radius: 8px;
+  color: var(--text);
+  transition: border-color 0.2s ease, background 0.2s ease;
+  /* Faint inset top line — book-cover gilding */
+  box-shadow: inset 0 1px 0 rgba(200, 152, 58, 0.08);
+}
+
+.adminCard:hover {
+  border-color: var(--accent-dim);
+  background: var(--surface-3);
 }
 
 .adminCard h2 {
-  font-size: 1.15rem;
-  margin-bottom: 0.25rem;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.3rem;
+  color: var(--text);
 }
 
 .adminCard p {
-  color: var(--ink-soft);
-  font-size: 0.9rem;
+  color: var(--text-soft);
+  font-size: 0.875rem;
 }
 
 .soon {
-  opacity: 0.55;
+  opacity: 0.45;
+  pointer-events: none;
 }
 
-/* --- List header + table --- */
+/* ============================================================
+   LIST HEADER + TABLE
+   ============================================================ */
+
 .listHead {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 
 .empty {
-  color: var(--ink-soft);
+  color: var(--text-soft);
+  font-style: italic;
 }
 
 .table {
@@ -122,24 +163,35 @@
   border-collapse: collapse;
 }
 
+.table thead tr {
+  border-bottom: 1px solid var(--border-solid);
+}
+
 .table th,
 .table td {
   text-align: left;
-  padding: 0.6rem 0.75rem;
-  border-bottom: 1px solid var(--border);
+  padding: 0.65rem 0.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   vertical-align: middle;
 }
 
 .table th {
   font-family: var(--font-display), serif;
-  font-size: 0.85rem;
-  color: var(--ink-soft);
+  font-size: 0.78rem;
+  color: var(--text-soft);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+.table tbody tr:hover td {
+  background: var(--surface-3);
 }
 
 .mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.85rem;
-  color: var(--ink-soft);
+  font-size: 0.82rem;
+  color: var(--text-faint);
 }
 
 .rowActions {
@@ -150,45 +202,85 @@
 }
 
 .editLink {
-  color: var(--gold);
+  color: var(--accent);
+  font-size: 0.875rem;
+  transition: color 0.2s ease;
 }
 
-/* --- Buttons shared by forms/lists --- */
+.editLink:hover {
+  color: var(--gold-bright);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+/* Primary action button — used for "Save character", "New character" */
 .save {
   display: inline-block;
-  padding: 0.55rem 1rem;
-  background: var(--ink);
-  color: var(--parchment);
+  padding: 0.5rem 1.1rem;
+  background: var(--accent);
+  color: #0d0b0e;
   border: none;
-  border-radius: 4px;
-  font-family: inherit;
-  font-size: 0.95rem;
+  border-radius: 5px;
+  font-family: var(--font-display), serif;
+  font-size: 0.875rem;
+  letter-spacing: 0.03em;
   cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
 }
 
+.save:hover {
+  background: var(--gold-bright);
+  box-shadow: 0 0 0 3px rgba(200, 152, 58, 0.2);
+  color: #0d0b0e;
+}
+
+.save:active {
+  background: var(--accent-dim);
+}
+
+/* Ghost cancel link */
 .cancel {
-  padding: 0.55rem 1rem;
-  color: var(--ink-soft);
+  padding: 0.5rem 1rem;
+  color: var(--text-soft);
+  font-size: 0.875rem;
+  transition: color 0.2s ease;
 }
 
+.cancel:hover {
+  color: var(--text);
+}
+
+/* Danger delete button */
 .delete {
-  padding: 0.4rem 0.75rem;
+  padding: 0.35rem 0.7rem;
   background: transparent;
-  color: #8a2b2b;
-  border: 1px solid #d8b8b0;
+  color: #b06060;
+  border: 1px solid var(--crimson-border);
   border-radius: 4px;
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
 }
 
-/* --- Form --- */
+.delete:hover {
+  color: #e07070;
+  border-color: rgba(180, 80, 80, 0.6);
+}
+
+/* ============================================================
+   FORM
+   ============================================================ */
+
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.1rem;
   max-width: 640px;
-  margin-top: 1.25rem;
+  margin-top: 1.5rem;
 }
 
 .row {
@@ -205,28 +297,43 @@
 .label {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  font-size: 0.9rem;
-  color: var(--ink-soft);
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  letter-spacing: 0.03em;
 }
 
 .req {
-  color: #8a2b2b;
+  color: #b06060;
 }
 
 .label input,
 .label textarea {
   font-family: inherit;
-  font-size: 1rem;
-  color: var(--ink);
-  background: var(--parchment);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 0.55rem 0.7rem;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border-solid);
+  border-radius: 5px;
+  padding: 0.55rem 0.75rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.label input::placeholder,
+.label textarea::placeholder {
+  color: var(--text-faint);
 }
 
 .label textarea {
   resize: vertical;
+  line-height: 1.6;
+}
+
+.label input:focus,
+.label textarea:focus {
+  outline: none;
+  border-color: var(--accent-dim);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
 .actions {
@@ -236,7 +343,30 @@
   margin-top: 0.5rem;
 }
 
-/* --- Photo uploader: fixed preview box on the LEFT, controls on the RIGHT --- */
+/* ============================================================
+   PORTRAIT / PHOTO UPLOADER
+   ============================================================ */
+
+.portrait {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border-solid);
+  border-radius: 8px;
+  /* Faint top-edge shimmer to distinguish the panel */
+  box-shadow: inset 0 1px 0 rgba(200, 152, 58, 0.08);
+}
+
+.portraitTitle {
+  font-family: var(--font-display), serif;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
 .uploader {
   display: flex;
   flex-direction: row;
@@ -245,85 +375,126 @@
   flex-wrap: wrap;
 }
 
-/* Same fixed dimensions for the image and the empty placeholder, so the layout
-   never jumps when a generated/uploaded image appears. */
+/* Fixed-size portrait frame — framed illustration feel */
 .thumb,
 .thumbEmpty {
   width: 170px;
   height: 170px;
-  border-radius: 8px;
+  border-radius: 6px;
   flex-shrink: 0;
-  background: var(--parchment);
+  background: var(--surface-3);
 }
 
 .thumb {
   object-fit: cover;
-  border: 1px solid var(--border);
+  border: 2px solid var(--border-solid);
+  cursor: zoom-in;
+  transition: border-color 0.2s ease;
+}
+
+.thumb:hover {
+  border-color: var(--accent-dim);
 }
 
 .thumbEmpty {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px dashed var(--border);
-  color: var(--ink-soft);
-  font-size: 0.85rem;
+  border: 1px dashed var(--border-solid);
+  color: var(--text-faint);
+  font-size: 0.8rem;
   text-align: center;
 }
 
 .modelLabel {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  font-size: 0.85rem;
-  color: var(--ink-soft);
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--text-soft);
 }
 
 .modelSelect {
   font-family: inherit;
-  font-size: 0.9rem;
-  padding: 0.45rem 0.6rem;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: var(--parchment);
-  color: var(--ink);
+  font-size: 0.875rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--border-solid);
+  border-radius: 5px;
+  background: var(--surface-2);
+  color: var(--text);
   width: 100%;
   max-width: 360px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Grayed-out reference-upload label when the model can't use a reference. */
-.disabledHint {
-  opacity: 0.5;
-}
-
-/* Portrait panel wrapping the uploader in the form. */
-.portrait {
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-  padding: 1.1rem 1.2rem;
-  background: var(--parchment-deep);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
-
-.portraitTitle {
-  font-family: var(--font-display), serif;
-  font-size: 1rem;
-  letter-spacing: 0.02em;
-  color: var(--ink);
-}
-
-/* Gentle focus state for all form controls. */
-.label input:focus,
-.label textarea:focus,
 .modelSelect:focus {
   outline: none;
-  border-color: var(--gold);
-  box-shadow: 0 0 0 2px rgba(156, 122, 50, 0.18);
+  border-color: var(--accent-dim);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
-/* Lightbox overlay (click thumbnail to enlarge). */
+.disabledHint {
+  opacity: 0.4;
+}
+
+.uploaderControls {
+  display: flex;
+  flex: 1;
+  min-width: 240px;
+  flex-direction: column;
+  gap: 0.65rem;
+  font-size: 0.875rem;
+}
+
+.uploadHint {
+  color: var(--text-soft);
+  font-size: 0.8rem;
+}
+
+.removeImg {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: #b06060;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.82rem;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.removeImg:hover {
+  color: #e07070;
+}
+
+.generate {
+  align-self: flex-start;
+  padding: 0.45rem 0.9rem;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent-dim);
+  border-radius: 5px;
+  font-family: var(--font-display), serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.generate:hover {
+  background: rgba(200, 152, 58, 0.1);
+  border-color: var(--accent);
+}
+
+.generate:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* ============================================================
+   LIGHTBOX
+   ============================================================ */
+
 .lightboxBackdrop {
   position: fixed;
   inset: 0;
@@ -332,20 +503,26 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: rgba(28, 20, 8, 0.82);
+  background: rgba(8, 6, 12, 0.88);
   cursor: zoom-out;
+  backdrop-filter: blur(4px);
 }
 
 .lightboxImage {
   max-width: 92vw;
   max-height: 92vh;
-  border-radius: 8px;
-  border: 2px solid var(--gold);
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+  border-radius: 6px;
+  border: 1px solid var(--accent-dim);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.5),
+    0 16px 60px rgba(0, 0, 0, 0.7),
+    0 0 40px rgba(200, 152, 58, 0.08);
 }
 
-/* List "Name" cell: thumbnail + name aligned; placeholder keeps the column
-   steady when a character has no image yet. */
+/* ============================================================
+   LIST THUMBNAIL
+   ============================================================ */
+
 .nameCell {
   display: inline-flex;
   align-items: center;
@@ -357,63 +534,23 @@
   width: 36px;
   height: 36px;
   border-radius: 4px;
-  border: 1px dashed var(--border);
-  background: var(--parchment);
+  border: 1px dashed var(--border-solid);
+  background: var(--surface-3);
+  flex-shrink: 0;
 }
 
-.uploaderControls {
-  display: flex;
-  flex: 1;
-  min-width: 240px;
-  flex-direction: column;
-  gap: 0.6rem;
-  font-size: 0.9rem;
-}
-
-.uploadHint {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.35rem;
-  color: var(--ink-soft);
-}
-
-.removeImg {
-  align-self: flex-start;
-  background: none;
-  border: none;
-  color: #8a2b2b;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.85rem;
-  padding: 0;
-}
-
-.generate {
-  align-self: flex-start;
-  padding: 0.55rem 1rem;
-  /* Lighter than the panel (which is --parchment-deep) so the button reads as a
-     button instead of a thin border floating on the same color. */
-  background: var(--parchment);
-  color: var(--ink);
-  border: 1px solid var(--gold);
-  border-radius: 4px;
-  font-family: inherit;
-  font-size: 0.95rem;
-  cursor: pointer;
-}
-
-.generate:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-/* Small thumbnail shown in the list table. */
 .listThumb {
   width: 36px;
   height: 36px;
   object-fit: cover;
   border-radius: 4px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-solid);
   vertical-align: middle;
+  flex-shrink: 0;
+  cursor: zoom-in;
+  transition: border-color 0.2s ease;
+}
+
+.listThumb:hover {
+  border-color: var(--accent-dim);
 }
