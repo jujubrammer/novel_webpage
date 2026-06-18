@@ -20,6 +20,7 @@ export const maxDuration = 30;
 
 const MAX_BYTES = 4 * 1024 * 1024; // ~4 MB
 const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
+const ENTITY_ALLOWLIST = ["characters", "monsters", "locations"];
 
 export async function POST(request) {
   try {
@@ -27,6 +28,12 @@ export async function POST(request) {
     const { data } = await auth.getSession();
     if (!data?.user || !isAdminEmail(data.user.email)) {
       return Response.json({ error: "Not authorized." }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const entity = searchParams.get("entity") || "characters";
+    if (!ENTITY_ALLOWLIST.includes(entity)) {
+      return Response.json({ error: `Invalid entity: ${entity}` }, { status: 400 });
     }
 
     const form = await request.formData();
@@ -44,7 +51,7 @@ export async function POST(request) {
       );
     }
 
-    const { url } = await put(`characters/${file.name || "upload"}`, file, {
+    const { url } = await put(`${entity}/${file.name || "upload"}`, file, {
       access: "public",
       addRandomSuffix: true,
     });

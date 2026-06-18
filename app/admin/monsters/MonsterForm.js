@@ -49,7 +49,7 @@ export default function MonsterForm({ action, monster }) {
 
       <div className={styles.portrait}>
         <span className={styles.portraitTitle}>Portrait</span>
-        <PhotoUploader name="image_url" initialUrl={m.image_url || ""} />
+        <PhotoUploader name="image_url" initialUrl={m.image_url || ""} entity="monsters" />
       </div>
 
       <div className={styles.actions}>

@@ -5,34 +5,14 @@ import { revalidatePath } from "next/cache";
 import { sql } from "@/lib/db";
 import { slugify } from "@/lib/slug";
 import { requireAdmin } from "@/lib/auth/admin";
-
-function field(formData, key) {
-  const value = formData.get(key);
-  if (value == null) return null;
-  const text = value.toString().trim();
-  return text === "" ? null : text;
-}
-
-async function uniqueSlug(base, ignoreId = null) {
-  let slug = base;
-  let n = 1;
-
-  while (true) {
-    const rows = ignoreId
-      ? await sql`SELECT 1 FROM locations WHERE slug = ${slug} AND id <> ${ignoreId} LIMIT 1`
-      : await sql`SELECT 1 FROM locations WHERE slug = ${slug} LIMIT 1`;
-    if (rows.length === 0) return slug;
-    n += 1;
-    slug = `${base}-${n}`;
-  }
-}
+import { field, uniqueSlug } from "@/lib/admin/actions";
 
 export async function createLocation(formData) {
   await requireAdmin();
   const name = field(formData, "name");
   if (!name) throw new Error("Name is required.");
 
-  const slug = await uniqueSlug(slugify(name));
+  const slug = await uniqueSlug("locations", slugify(name));
 
   await sql`
     INSERT INTO locations
@@ -52,7 +32,7 @@ export async function updateLocation(id, formData) {
   const name = field(formData, "name");
   if (!name) throw new Error("Name is required.");
 
-  const slug = await uniqueSlug(slugify(name), id);
+  const slug = await uniqueSlug("locations", slugify(name), id);
 
   await sql`
     UPDATE locations SET
