@@ -7,6 +7,7 @@ import Link from "next/link";
 import { sql } from "@/lib/db";
 import { deleteCharacter } from "./actions";
 import DeleteButton from "./DeleteButton";
+import ImageLightbox from "./ImageLightbox";
 import styles from "../admin.module.css";
 
 // Always read fresh from the DB (don't cache this page).
@@ -46,11 +47,14 @@ export default async function CharactersListPage() {
             {characters.map((c) => (
               <tr key={c.id}>
                 <td>
-                  {c.image_url && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={c.image_url} alt="" className={styles.listThumb} />
-                  )}{" "}
-                  {c.name}
+                  <span className={styles.nameCell}>
+                    {c.image_url ? (
+                      <ImageLightbox src={c.image_url} alt={c.name} className={styles.listThumb} />
+                    ) : (
+                      <span className={styles.listThumbEmpty} aria-hidden="true" />
+                    )}
+                    {c.name}
+                  </span>
                 </td>
                 <td>{c.species || "—"}</td>
                 <td className={styles.mono}>{c.slug}</td>

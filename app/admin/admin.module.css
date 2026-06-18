@@ -236,32 +236,36 @@
   margin-top: 0.5rem;
 }
 
-/* --- Photo uploader --- */
+/* --- Photo uploader: fixed preview box on the LEFT, controls on the RIGHT --- */
 .uploader {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-start;
-  gap: 0.85rem;
+  gap: 1.25rem;
+  flex-wrap: wrap;
 }
 
-.thumb {
-  width: 280px;
-  height: auto;
-  max-height: 360px;
-  object-fit: contain;
-  border: 1px solid var(--border);
+/* Same fixed dimensions for the image and the empty placeholder, so the layout
+   never jumps when a generated/uploaded image appears. */
+.thumb,
+.thumbEmpty {
+  width: 220px;
+  height: 220px;
   border-radius: 8px;
+  flex-shrink: 0;
   background: var(--parchment);
 }
 
+.thumb {
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
 .thumbEmpty {
-  width: 280px;
-  height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1px dashed var(--border);
-  border-radius: 8px;
   color: var(--ink-soft);
   font-size: 0.85rem;
   text-align: center;
@@ -291,10 +295,77 @@
   opacity: 0.5;
 }
 
-.uploaderControls {
+/* Portrait panel wrapping the uploader in the form. */
+.portrait {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.9rem;
+  padding: 1.1rem 1.2rem;
+  background: var(--parchment-deep);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.portraitTitle {
+  font-family: var(--font-display), serif;
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+
+/* Gentle focus state for all form controls. */
+.label input:focus,
+.label textarea:focus,
+.modelSelect:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(156, 122, 50, 0.18);
+}
+
+/* Lightbox overlay (click thumbnail to enlarge). */
+.lightboxBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: rgba(28, 20, 8, 0.82);
+  cursor: zoom-out;
+}
+
+.lightboxImage {
+  max-width: 92vw;
+  max-height: 92vh;
+  border-radius: 8px;
+  border: 2px solid var(--gold);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+}
+
+/* List "Name" cell: thumbnail + name aligned; placeholder keeps the column
+   steady when a character has no image yet. */
+.nameCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.listThumbEmpty {
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  border-radius: 4px;
+  border: 1px dashed var(--border);
+  background: var(--parchment);
+}
+
+.uploaderControls {
+  display: flex;
+  flex: 1;
+  min-width: 240px;
+  flex-direction: column;
+  gap: 0.6rem;
   font-size: 0.9rem;
 }
 
