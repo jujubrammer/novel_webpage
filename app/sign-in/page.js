@@ -46,10 +46,9 @@ export default function SignInPage() {
         throw new Error(result.error.message || "Authentication failed.");
       }
 
-      // Success → go to the admin area. refresh() re-runs the server layout
-      // so it sees the new session cookie.
-      router.push("/admin");
-      router.refresh();
+      // Hard navigation so the browser sends all fresh cookies and Next.js
+      // can't serve a stale cached redirect from before the session existed.
+      window.location.href = "/admin";
     } catch (err) {
       setError(err?.message || "Something went wrong. Please try again.");
     } finally {
