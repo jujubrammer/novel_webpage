@@ -1,46 +1,56 @@
 // app/api/blob/upload/route.js
 // ---------------------------------------------------------------------------
-// Authorizes browser → Vercel Blob uploads. The browser doesn't get our secret
-// token; instead the PhotoUploader calls this route, we verify the user is an
-// admin, and `handleUpload` hands back a short-lived token so the file uploads
-// DIRECTLY from the browser to Blob (so big photos don't pass through this
-// server function). Requires BLOB_READ_WRITE_TOKEN in the environment.
+// Receives a device file upload and stores it in Vercel Blob (SERVER-SIDE).
+// The browser POSTs the file as multipart form-data; we upload it with `put`
+// and return the public URL. This avoids the client-upload "completion
+// callback" flow, which fails on protected/preview deployments (the blocked
+// callback returns an HTML page, which then breaks JSON parsing in the browser).
+//
+// Trade-off: the file passes through this function, so it's bounded by the
+// platform request-body limit (~4.5 MB). That's plenty for a portrait.
+// Requires BLOB_READ_WRITE_TOKEN in the environment.
 // ---------------------------------------------------------------------------
 
-import { handleUpload } from "@vercel/blob/client";
+import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth/server";
 import { isAdminEmail } from "@/lib/auth/admin";
 
+export const dynamic = "force-dynamic";
+export const maxDuration = 30;
+
+const MAX_BYTES = 4 * 1024 * 1024; // ~4 MB
+const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
+
 export async function POST(request) {
-  const body = await request.json();
   try {
-    const jsonResponse = await handleUpload({
-      body,
-      request,
-      onBeforeGenerateToken: async () => {
-        // Only a signed-in admin may upload.
-        const { data } = await auth.getSession();
-        if (!data?.user || !isAdminEmail(data.user.email)) {
-          throw new Error("Not authorized to upload.");
-        }
-        return {
-          allowedContentTypes: [
-            "image/jpeg",
-            "image/png",
-            "image/webp",
-            "image/gif",
-            "image/avif",
-          ],
-          addRandomSuffix: true, // avoid filename collisions
-          maximumSizeInBytes: 10 * 1024 * 1024, // 10 MB cap
-        };
-      },
-      // Runs after the upload finishes. We don't need to do anything here —
-      // the returned URL is saved when the character form is submitted.
-      onUploadCompleted: async () => {},
+    // Only signed-in admins may upload.
+    const { data } = await auth.getSession();
+    if (!data?.user || !isAdminEmail(data.user.email)) {
+      return Response.json({ error: "Not authorized." }, { status: 401 });
+    }
+
+    const form = await request.formData();
+    const file = form.get("file");
+    if (!file || typeof file === "string") {
+      return Response.json({ error: "No file was provided." }, { status: 400 });
+    }
+    if (file.type && !ALLOWED.includes(file.type)) {
+      return Response.json({ error: `Unsupported image type: ${file.type}` }, { status: 400 });
+    }
+    if (file.size > MAX_BYTES) {
+      return Response.json(
+        { error: "Image is too large (max ~4 MB). Please use a smaller file." },
+        { status: 400 }
+      );
+    }
+
+    const { url } = await put(`characters/${file.name || "upload"}`, file, {
+      access: "public",
+      addRandomSuffix: true,
     });
-    return Response.json(jsonResponse);
+
+    return Response.json({ url });
   } catch (error) {
-    return Response.json({ error: String(error?.message || error) }, { status: 400 });
+    return Response.json({ error: String(error?.message || error) }, { status: 500 });
   }
 }

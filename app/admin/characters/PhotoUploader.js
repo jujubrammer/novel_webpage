@@ -10,7 +10,6 @@
 "use client";
 
 import { useState } from "react";
-import { upload } from "@vercel/blob/client";
 import {
   IMAGE_MODELS,
   DEFAULT_IMAGE_MODEL,
@@ -18,6 +17,25 @@ import {
 } from "@/lib/image-models";
 import ImageLightbox from "./ImageLightbox";
 import styles from "../admin.module.css";
+
+// Read a response safely: if the server returns a non-JSON error (a platform
+// error page, a timeout, etc.), surface its actual text instead of a confusing
+// "Unexpected token … is not valid JSON" from JSON.parse.
+async function parseResponse(res) {
+  const raw = await res.text();
+  let body = {};
+  if (raw) {
+    try {
+      body = JSON.parse(raw);
+    } catch {
+      throw new Error(`Server error (${res.status}). ${raw.slice(0, 160)}`);
+    }
+  }
+  if (!res.ok) {
+    throw new Error(body.error || `Request failed (${res.status}).`);
+  }
+  return body;
+}
 
 function collectCharacter(form) {
   const f = (n) => (form?.elements?.namedItem(n)?.value || "").trim();
@@ -49,11 +67,12 @@ export default function PhotoUploader({ name = "image_url", initialUrl = "" }) {
     setStatus("Uploading…");
     setBusy(true);
     try {
-      const blob = await upload(file.name, file, {
-        access: "public",
-        handleUploadUrl: "/api/blob/upload",
-      });
-      setUrl(blob.url);
+      // Server-side upload: send the file to our route, which stores it in Blob.
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/blob/upload", { method: "POST", body: form });
+      const result = await parseResponse(res);
+      setUrl(result.url);
     } catch (err) {
       setError(err?.message || "Upload failed.");
     } finally {
@@ -84,8 +103,7 @@ export default function PhotoUploader({ name = "image_url", initialUrl = "" }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ character, referenceUrl: url || null, model }),
       });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || "Generation failed.");
+      const result = await parseResponse(res);
       setUrl(result.url);
       setNote(
         result.usedReference
