@@ -17,7 +17,11 @@ import { generateText, generateImage, gateway } from "ai";
 import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth/server";
 import { isAdminEmail } from "@/lib/auth/admin";
-import { IMAGE_MODEL_IDS, DEFAULT_IMAGE_MODEL } from "@/lib/image-models";
+import {
+  IMAGE_MODEL_IDS,
+  DEFAULT_IMAGE_MODEL,
+  modelSupportsReference,
+} from "@/lib/image-models";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120; // two model calls; image gen can be slow
@@ -67,13 +71,26 @@ export async function POST(request) {
 
     // --- Pass 2: image model renders it (optionally editing a reference). ---
     let promptArg = imagePrompt;
-    if (referenceUrl) {
-      // Fetch the existing image (public Blob URL) to use as a starting point.
+    let usedReference = false;
+
+    // Only attempt a reference if one was sent AND the chosen model can use it.
+    if (referenceUrl && modelSupportsReference(imageModel)) {
       const refRes = await fetch(referenceUrl);
-      if (refRes.ok) {
-        const refBytes = new Uint8Array(await refRes.arrayBuffer());
-        promptArg = { images: [refBytes], text: imagePrompt };
+      if (!refRes.ok) {
+        // Don't silently ignore it — surface the failure so it's debuggable.
+        return Response.json(
+          { error: `Couldn't load the reference image (HTTP ${refRes.status}).` },
+          { status: 502 }
+        );
       }
+      const refBytes = new Uint8Array(await refRes.arrayBuffer());
+      // For editing, lead with identity preservation so the model keeps the
+      // same character rather than drawing someone new.
+      const editPrompt =
+        "Keep the same character, face, and identity as the provided reference " +
+        `image. Apply this description: ${imagePrompt}`;
+      promptArg = { images: [refBytes], text: editPrompt };
+      usedReference = true;
     }
 
     const { image } = await generateImage({
@@ -88,7 +105,7 @@ export async function POST(request) {
       addRandomSuffix: true,
     });
 
-    return Response.json({ url, imagePrompt });
+    return Response.json({ url, usedReference, imagePrompt });
   } catch (e) {
     return Response.json({ error: String(e?.message || e) }, { status: 500 });
   }

@@ -286,6 +286,11 @@
   max-width: 360px;
 }
 
+/* Grayed-out reference-upload label when the model can't use a reference. */
+.disabledHint {
+  opacity: 0.5;
+}
+
 .uploaderControls {
   display: flex;
   flex-direction: column;
