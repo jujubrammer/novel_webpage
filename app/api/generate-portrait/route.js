@@ -31,31 +31,33 @@ export const maxDuration = 120; // two model calls; image gen can be slow
 const PROMPT_MODEL = "openai/gpt-5-mini";
 
 export async function POST(request) {
-  // Only signed-in admins may generate images.
-  const { data } = await auth.getSession();
-  if (!data?.user || !isAdminEmail(data.user.email)) {
-    return Response.json({ error: "Not authorized." }, { status: 401 });
-  }
-
-  const { character, referenceUrl, model } = await request.json();
-
-  // Use the chosen model only if it's one we offer; otherwise the default.
-  const imageModel = IMAGE_MODEL_IDS.includes(model) ? model : DEFAULT_IMAGE_MODEL;
-
-  // Turn the filled-in fields into a readable block for the text model.
-  const details = Object.entries(character || {})
-    .filter(([, v]) => v && String(v).trim())
-    .map(([k, v]) => `${k}: ${String(v).trim()}`)
-    .join("\n");
-
-  if (!details) {
-    return Response.json(
-      { error: "Fill in at least a name, species, or appearance first." },
-      { status: 400 }
-    );
-  }
-
+  // One big try/catch so EVERY path returns JSON — including auth and body
+  // parsing — so the browser never gets a non-JSON error page to choke on.
   try {
+    // Only signed-in admins may generate images.
+    const { data } = await auth.getSession();
+    if (!data?.user || !isAdminEmail(data.user.email)) {
+      return Response.json({ error: "Not authorized." }, { status: 401 });
+    }
+
+    const { character, referenceUrl, model } = await request.json();
+
+    // Use the chosen model only if it's one we offer; otherwise the default.
+    const imageModel = IMAGE_MODEL_IDS.includes(model) ? model : DEFAULT_IMAGE_MODEL;
+
+    // Turn the filled-in fields into a readable block for the text model.
+    const details = Object.entries(character || {})
+      .filter(([, v]) => v && String(v).trim())
+      .map(([k, v]) => `${k}: ${String(v).trim()}`)
+      .join("\n");
+
+    if (!details) {
+      return Response.json(
+        { error: "Fill in at least a name, species, or appearance first." },
+        { status: 400 }
+      );
+    }
+
     // --- Pass 1: text model writes a vivid image prompt from the details. ---
     const { text } = await generateText({
       model: PROMPT_MODEL,
