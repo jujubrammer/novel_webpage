@@ -51,7 +51,7 @@ function collectFormFields(form) {
   return result;
 }
 
-export default function PhotoUploader({ name = "image_url", initialUrl = "" }) {
+export default function PhotoUploader({ name = "image_url", initialUrl = "", entity = "characters" }) {
   const [url, setUrl] = useState(initialUrl || "");
   const [model, setModel] = useState(DEFAULT_IMAGE_MODEL);
   const [busy, setBusy] = useState(false);
@@ -72,7 +72,7 @@ export default function PhotoUploader({ name = "image_url", initialUrl = "" }) {
       // Server-side upload: send the file to our route, which stores it in Blob.
       const form = new FormData();
       form.append("file", file);
-      const res = await fetch("/api/blob/upload", { method: "POST", body: form });
+      const res = await fetch(`/api/blob/upload?entity=${entity}`, { method: "POST", body: form });
       const result = await parseResponse(res);
       setUrl(result.url);
     } catch (err) {
@@ -103,7 +103,7 @@ export default function PhotoUploader({ name = "image_url", initialUrl = "" }) {
       const res = await fetch("/api/generate-portrait", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ character, referenceUrl: url || null, model }),
+        body: JSON.stringify({ character, referenceUrl: url || null, model, entity }),
       });
       const result = await parseResponse(res);
       setUrl(result.url);

@@ -40,7 +40,10 @@ export async function POST(request) {
       return Response.json({ error: "Not authorized." }, { status: 401 });
     }
 
-    const { character, referenceUrl, model } = await request.json();
+    const ENTITY_ALLOWLIST = ["characters", "monsters", "locations"];
+    const body = await request.json();
+    const { character, referenceUrl, model } = body;
+    const entity = ENTITY_ALLOWLIST.includes(body.entity) ? body.entity : "characters";
 
     // Use the chosen model only if it's one we offer; otherwise the default.
     const imageModel = IMAGE_MODEL_IDS.includes(model) ? model : DEFAULT_IMAGE_MODEL;
@@ -101,7 +104,7 @@ export async function POST(request) {
     });
 
     // Persist to Blob so we have a stable public URL.
-    const { url } = await put("characters/portrait.png", Buffer.from(image.uint8Array), {
+    const { url } = await put(`${entity}/portrait.png`, Buffer.from(image.uint8Array), {
       access: "public",
       contentType: "image/png",
       addRandomSuffix: true,

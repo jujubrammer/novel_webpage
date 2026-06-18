@@ -14,38 +14,14 @@ import { revalidatePath } from "next/cache";
 import { sql } from "@/lib/db";
 import { slugify } from "@/lib/slug";
 import { requireAdmin } from "@/lib/auth/admin";
-
-// Read one form field. Returns null for empty fields so the database stores a
-// clean NULL instead of an empty string. (Trimming user-typed form input is
-// fine — this is not an environment variable.)
-function field(formData, key) {
-  const value = formData.get(key);
-  if (value == null) return null;
-  const text = value.toString().trim();
-  return text === "" ? null : text;
-}
-
-// Find a slug that isn't taken yet: "elara", then "elara-2", "elara-3", ...
-async function uniqueSlug(base, ignoreId = null) {
-  let slug = base;
-  let n = 1;
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const rows = ignoreId
-      ? await sql`SELECT 1 FROM characters WHERE slug = ${slug} AND id <> ${ignoreId} LIMIT 1`
-      : await sql`SELECT 1 FROM characters WHERE slug = ${slug} LIMIT 1`;
-    if (rows.length === 0) return slug;
-    n += 1;
-    slug = `${base}-${n}`;
-  }
-}
+import { field, uniqueSlug } from "@/lib/admin/actions";
 
 export async function createCharacter(formData) {
   await requireAdmin(); // only a signed-in admin may create
   const name = field(formData, "name");
   if (!name) throw new Error("Name is required.");
 
-  const slug = await uniqueSlug(slugify(name));
+  const slug = await uniqueSlug("characters", slugify(name));
 
   await sql`
     INSERT INTO characters
@@ -66,7 +42,7 @@ export async function updateCharacter(id, formData) {
   const name = field(formData, "name");
   if (!name) throw new Error("Name is required.");
 
-  const slug = await uniqueSlug(slugify(name), id);
+  const slug = await uniqueSlug("characters", slugify(name), id);
 
   await sql`
     UPDATE characters SET

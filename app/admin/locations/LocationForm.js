@@ -44,7 +44,7 @@ export default function LocationForm({ action, location }) {
 
       <div className={styles.portrait}>
         <span className={styles.portraitTitle}>Image</span>
-        <PhotoUploader name="image_url" initialUrl={l.image_url || ""} />
+        <PhotoUploader name="image_url" initialUrl={l.image_url || ""} entity="locations" />
       </div>
 
       <div className={styles.actions}>
